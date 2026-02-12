@@ -1,0 +1,36 @@
+from sklearn.datasets import fetch_california_housing
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_absolute_error
+
+def main() -> None:
+    # load dataset
+    housing = fetch_california_housing(as_frame = True)
+    # pandas table
+    hf = housing.frame
+
+    # data the model will look at, dropped column target_names assigned MedHouseVal
+    X = hf.drop(columns = ["MedHouseVal"])
+    # target for model to predict
+    y = hf["MedHouseVal"]
+
+    # split
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size = 0.33, random_state = 42
+    )
+
+    # train linear regression as baseline model
+    model = LinearRegression()
+    model.fit(X_train, y_train)
+
+    # prediction
+    pred = model.predict(X_test)
+    # evaluation
+    mae = mean_absolute_error(y_test, pred)
+    # convert MAE to dollars
+    mae_dollars = mae * 100_000
+
+    print(f"\nLinear Regression MAE: {mae:.4f} or about ${mae_dollars:,.0f}")
+
+if __name__ == "__main__":
+    main()
