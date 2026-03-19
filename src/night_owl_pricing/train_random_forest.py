@@ -2,6 +2,8 @@ from sklearn.datasets import fetch_california_housing
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_absolute_error
+import joblib
+import json
 
 def main() -> None:
     # load dataset
@@ -28,6 +30,19 @@ def main() -> None:
     mae = mean_absolute_error(y_test, pred)
     # convert MAE to dollars
     mae_dollars = mae * 100_000
+
+    # save trained model
+    joblib.dump(rf, "model/random_forest.joblib")
+
+    # save results for streamlit app
+    results = {
+        "feature_names": list(X.columns),
+        "rf_mae_units": mae,
+        "rf_mae_dollars": mae_dollars
+    }
+
+    with open("model/results.json", "w") as f:
+        json.dump(results, f, indent = 4)
 
     print(f"\nRandom Forest MAE: {mae:.4f} or about ${mae_dollars:,.0f}")
 
