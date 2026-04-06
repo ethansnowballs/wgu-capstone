@@ -2,15 +2,26 @@ import streamlit
 import pandas
 import plotly.express
 from sklearn.datasets import fetch_california_housing
+import joblib
 
 streamlit.set_page_config(page_title = "Night Owl Real Estate Pricing Tool")
 streamlit.title("Night Owl Real Estate Pricing Tool")
 streamlit.subheader("Prototype dashboard for home price recommendations")
 
+@streamlit.cache_data
+def load_data():
+    housing = fetch_california_housing(as_frame = True)
+    return housing.frame
+
+@streamlit.cache_resource
+def load_model():
+    return joblib.load("model/random_forest.joblib")
+
 # load dataset
-housing = fetch_california_housing(as_frame = True)
-# pandas table
-hf = housing.frame
+hf = load_data()
+
+# load model
+model = load_model()
 
 # sidebar filter
 streamlit.sidebar.header("Interactive Filter")
@@ -81,7 +92,7 @@ scatter_chart = plotly.express.scatter(
 )
 
 # format scatter plot chart
-scatter_chart.update_layout(height = 1200)
+scatter_chart.update_layout(height = 800)
 scatter_chart.update_xaxes(title_text = "Median Income")
 scatter_chart.update_yaxes(
     title_text = "Median House Value",
@@ -115,7 +126,7 @@ box_plot = plotly.express.box(
 )
 
 # format box plot
-box_plot.update_layout(height = 900)
+box_plot.update_layout(height = 700)
 box_plot.update_xaxes(title_text = "House Age Group")
 box_plot.update_yaxes(
     title_text = "Median House Value",
